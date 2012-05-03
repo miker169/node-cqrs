@@ -1,5 +1,8 @@
-CommandBus = require("./lib/CommandBus")
-CommandHandler = require("./lib/CommandHandler").CommandHandler
-commandBus =  new CommandBus()
-commandBus.registerHandler 'test' , new CommandHandler()
-commandBus.execute 'test'
+EventBus = require "./lib/eventBus"
+db = require "./lib/storage"
+eventBus = new EventBus()
+eventBus.loadData 1, (snapshot, events) ->
+  console.log "snapshot:"
+  console.log snapshot
+  console.log "events:"
+  console.log events
