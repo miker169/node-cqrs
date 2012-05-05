@@ -5,20 +5,19 @@ class Storage
     @edb = redis.createClient()
   storeSnapshot: (aggregateid, lastEventId, snapshot,callback) ->
     transaction = @edb.multi()
+    console.log Json.stringify(snapshot)
     transaction.hset "aggregate:" + aggregateId + ":snapshot", "data", JSON.stringify(snapshot)
     transaction.hset "aggregate:" + aggregateId + ":snapshot", "eventId", lastEventId
     transaction.exec (err, replies) ->
-  storeEvent: (evt, callback) ->
+  storeEvent: (event, callback) ->
     self = this
-    @edb.inc "guid", (err, value) ->
-      @ebd.set "event:" + value, data
-      data = JSON.stringify(
-        aggregateId: event.aggregateId
-        name: event.name
-        attributes: event.attributes
-      )
-      self.edb.rpush "aggregate:" + event.aggregateId + ":events", data, (err, index) ->
-        callback index if callback
+    data = JSON.stringify(
+      'aggregateId': event.aggregateId
+      'name': event.name
+      'attributes': event.attributes
+    )
+    self.edb.rpush "aggregate:" + event.aggregateId + ":events", data, (err, index) ->
+      callback index if callback
   loadData: (aggregateId, callback) ->
     self = this
     transaction = @edb.multi()
@@ -26,8 +25,9 @@ class Storage
     transaction.hgetall "aggregate:" + aggregateId + ":snapshot"
     transaction.exec (err, replies) ->
       snapshot = replies[1]
-      to = replies[1]
-      from = snapshot.eventId
+      console.log replies
+      to = replies[0]
+      from = snapshot.eventId + 1
       self.edb.lrange "aggregate:" + aggregateId + ":events", from, to , (err, docs) ->
         len = docs.length
         events = []
@@ -36,7 +36,8 @@ class Storage
         while i < len
           events.push JSON.parse(docs[i])
           i++
-        callback snapshot.data, events
-
+          snapshot.data = null unless snapshot.data
+          console.log events
+          callback JSON.parse(snapshot.data), events, to -1
 storage = new Storage()
 module.exports = storage

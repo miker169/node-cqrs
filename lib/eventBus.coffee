@@ -1,19 +1,17 @@
 db = require "./storage"
-Event = require "./event"
 
 class EventBus
-  save: (eventName, aggregateId, attributes) ->
-    event = new Event(
-      name: eventName
-      aggregateID: aggregateID
+  loadData: (aggregateID, callback) =>
+    console.log "aggregateID to load", aggregateID
+    console.log "Whats the calback?", callback 
+    db.loadData aggregateID, callback
+  save: (name, aggregateId, attributes) =>
+   db.storeEvent(
+      name: name,
+      aggregateId: aggregateId,
       attributes: attributes
     )
-    event.save()
-  getEventBefore:(aggregateID, beforeEventId, callback) ->
-    Event.getEventBefore aggregateID, beforeEventId, callback
-  storeSnapshot: (aggregateID, lastEventId, snapshot, callback) ->
+  storeSnapshot: (aggregateID, lastEventId, snapshot, callback) =>
     db.storeSnapshot aggregateID, lastEventId, snapshot, callback
-  loadData:(aggregateID, callback) ->
-    db.loadData aggregateID, callback
-
-module.exports = EventBus
+eventBus = new EventBus()
+module.exports = eventBus

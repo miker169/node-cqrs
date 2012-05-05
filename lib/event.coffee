@@ -21,3 +21,5 @@ class Event
   getLastEventIndex: (aggregateId, callback) ->
     db.getLastEventIndex aggregateId, (err, doc) ->
       callback doc
+event = new Event()
+module.exports = event
