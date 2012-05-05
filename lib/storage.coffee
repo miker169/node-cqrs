@@ -25,10 +25,7 @@ class Storage
     transaction.exec (err, replies) ->
       snapshot = replies[1]
       to = replies[0]
-      from = 0
-      if snapshot 
-        from = snapshot.eventId if snapshot.eventId
-
+      from = snapshot.eventId ? parseInt(snapshot.eventID): 0 
       self.edb.lrange "aggregate:" + aggregateId + ":events", from, to , (err, docs) ->
         len = docs.length
         events = []
@@ -38,6 +35,6 @@ class Storage
           events.push JSON.parse(docs[i])
           i++
           snapshot.data = null unless snapshot.data
-          callback JSON.parse(snapshot.data), events, to -1
+          callback JSON.parse(snapshot.data), events,to
 storage = new Storage()
 module.exports = storage

@@ -1,5 +1,4 @@
 db = require "./storage"
-Event = require "./event"
 
 class EventBus
   loadData: (aggregateID, callback) ->

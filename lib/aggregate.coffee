@@ -17,6 +17,7 @@ class Aggregate
       while i < events.length
         self.apply events[i]
         i++
+      EventBus.storeSnapshot self._id, lastEventId, self.snapshot()
       callback.call self if callback
   @snapshot = ->
     {}
@@ -25,7 +26,7 @@ class Aggregate
   @apply: (event) ->
 
   @emit: (event) ->
-     EventBus.store event, @_id, attributes
+     EventBus.storeEvent name, @_id, attributes
 
 console.log Aggregate
 module.exports = Aggregate
