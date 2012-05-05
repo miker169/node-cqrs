@@ -5,7 +5,7 @@ class EventBus
     console.log "aggregateID to load", aggregateID
     console.log "Whats the calback?", callback 
     db.loadData aggregateID, callback
-  save: (name, aggregateId, attributes) =>
+  storeEvent: (name, aggregateId, attributes) =>
    db.storeEvent(
       name: name,
       aggregateId: aggregateId,
