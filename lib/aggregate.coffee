@@ -1,30 +1,31 @@
 EventBus = require './eventBus'
 
+###
+  The Aggregate is the system entities and value obejcts which we use to
+  maintain transactional consistency throughout the application. It should
+  encapsulate a set of objects which it should keep consistent and also kep
+  business driven set of invariants
+###
 class Aggregate
-  constructor: (id) ->
+  constructor: (id, callback) ->
     @_id = id
     self = this
-    start = new Date().getTime()
-    @_quantity = 0
-    console.log @_id
+    #Load some data from the evnt storage
     EventBus.loadData @_id, (snapshot, events, lastEventId) ->
-      self.init snapshot
-      len = events.length
+      self.init snapshot if snapshot
       i = 0
-      while i < len
+      while i < events.length
         self.apply events[i]
         i++
-      EventBus.storeSnapshot self._id, lastEventId,
-        quantity: self._quantity
-      console.log new Date().getTime() - start + " ms"
-  @find: (id) ->
-    new Aggregate(id)
+      callback.call self if callback
+  @snapshot = ->
+    {}
+  @init: (data) ->
 
   @apply: (event) ->
-    @_total += event.attribute.alount
 
   @emit: (event) ->
-     EventBus.store event
+     EventBus.store event, @_id, attributes
 
 console.log Aggregate
 module.exports = Aggregate
