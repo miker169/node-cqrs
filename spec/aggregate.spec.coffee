@@ -6,6 +6,13 @@ describe 'Aggregate', ->
   beforeEach ->
     EventBus.storeSnapshot = ->
 
+  describe "emit", ->
+    it "should emit event to the event bus", ->
+      aggregate = new Aggregate 1
+      spyOn EventBus, 'storeEvent'
+      aggregate.emit 'foo', {foo: 'bar'}
+      expect(EventBus.storeEvent).toHaveBeenCalledWith( 'foo', 1, {foo: 'bar'})
+
   describe "constructor", ->
     it "should load data from the event bus", ->
       spyOn EventBus, "loadData"
