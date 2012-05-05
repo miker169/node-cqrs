@@ -48,6 +48,25 @@ describe 'Aggregate', ->
         waits 15
         runs ->
           expect(@aggregate.apply).toHaveBeenCalledWith foo
+      it "should call store snapshot", ->
+        runs ->
+          EventBus.loadData = (id, callback) ->
+            setTimeout (->
+              callback null, [foo], 1
+            ), 10
+          @aggregate = new Aggregate 1
+          spyOn EventBus, "storeSnapshot"
+          spyOn(@aggregate, "snapshot").andReturn foo
+        waits 15
+        runs ->
+          expect(EventBus.storeSnapshot).toHaveBeenCalledWith 1, 1, foo
+      it "should call callback if one is specified", ->
+        @handler = ->
+        EventBus.loadData = (id, callback) ->
+          callback null, [foo], 1
+        spyOn this, "handler"
+        @aggregate = new Aggregate 1, @handler
+        expect(@handler).toHaveBeenCalled()
 
 
 
