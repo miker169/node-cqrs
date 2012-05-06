@@ -18,11 +18,12 @@ describe "couchdb", ->
       spyOn couchdb, 'createDocument'
       couchdb.storeEvent 1, 'user:created',
         foo: "bar"
-      expect(couchdb.createDocument).toHaveBeenCalledWith
+      expect(couchdb.createDocument).toHaveBeenCalledWith JSON.stringify(
         aggregateId: 1
         name: "user:created"
         attrs:
           foo: "bar"
+      )
   describe "getEventsByAggregate", ->
 
   describe "getEventsByType", ->
