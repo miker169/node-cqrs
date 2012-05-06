@@ -14,24 +14,40 @@ describe "couchdb", ->
     expect(couchdb.options.port).toEqual 5984
   describe "createDocument", ->
     it "should call proper request", ->
+      callback = ->
+
       data = JSON.stringify foo: "bar"
       options =
-        method: "PUT"
         path: "/cqrs/1234"
+        method: "PUT"
         data: data
+      couchdbGetUuid = couchdb.getUuid
+      couchdb.getUuid = (callback) ->
+        callback "1234"
       spyOn couchdb, "request"
-      spyOn(couchdb, 'getUuid').andReturn '1234'
-      couchdb.createDocument data
-      expect(couchdb.request).toHaveBeenCalledWith options
+      couchdb.createDocument data, callback
+
+      expect(couchdb.request).toHaveBeenCalledWith options, callback
+      couchdb.getUuid = couchdbGetUuid
 
   describe "getUuid", ->
     it "should call proper request", ->
       options =
-        path: '/_uuids'
         method: 'GET'
+        path: '/_uuids'
       spyOn couchdb, 'request'
       couchdb.getUuid()
-      expect(couchdb.request).toHaveBeenCalledWith options
+      expect(couchdb.request).toHaveBeenCalledWith options, jasmine.any(Function)
+    it "should parse value and call callback", ->
+      foo = callback: ->
+      
+      couchdbRequest = couchdb.request
+      couchdb.request = (options, callback) ->
+        callback "{\"uuids\":[\"somerandomtokenwithnumbers12345\"]}\nundefined"
+
+      spyOn foo, "callback"
+      couchdb.getUuid foo.callback
+      expect(foo.callback).toHaveBeenCalledWith "somerandomtokenwithnumbers12345"
 
   describe "request", ->
     req = undefined
