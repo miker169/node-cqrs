@@ -44,7 +44,7 @@ describe "couchdb", ->
       
       couchdbRequest = couchdb.request
       couchdb.request = (options, callback) ->
-        callback "{\"uuids\":[\"somerandomtokenwithnumbers12345\"]}\nundefined"
+        callback "{\"uuids\":[\"somerandomtokenwithnumbers12345\"]}"
 
       spyOn foo, "callback"
       couchdb.getUuid foo.callback
@@ -121,7 +121,7 @@ describe "couchdb", ->
         spyOn foo, 'callback'
         couchdb.request {}, foo.callback
         res.emit "data", "foo"
-        res.emit "end", ""
+        res.emit "end", undefined
         expect(foo.callback).toHaveBeenCalledWith "foo"
 
 
