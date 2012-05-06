@@ -13,6 +13,21 @@ describe "couchdb", ->
       expect(couchdb.options.host).toEqual "localhost"
     it "port should default to 5984", ->
       expect(couchdb.options.port).toEqual 5984
+  describe "storeEvent", ->
+    it "should call create Document", ->
+      spyOn couchdb, 'createDocument'
+      couchdb.storeEvent 1, 'user:created',
+        foo: "bar"
+      expect(couchdb.createDocument).toHaveBeenCalledWith
+        aggregateId: 1
+        name: "user:created"
+        attrs:
+          foo: "bar"
+  describe "getEventsByAggregate", ->
+
+  describe "getEventsByType", ->
+
+
   describe "createDocument", ->
     it "should call proper request", ->
       callback = ->
