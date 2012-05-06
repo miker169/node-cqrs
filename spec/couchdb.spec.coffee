@@ -22,14 +22,11 @@ describe "couchdb", ->
         path: "/cqrs/1234"
         method: "PUT"
         data: data
-      couchdbGetUuid = couchdb.getUuid
-      couchdb.getUuid = (callback) ->
-        callback "1234"
       spyOn couchdb, "request"
+      spyOn(couchdb, "getUuid").andCallFake (callback) ->
+        callback "1234"
       couchdb.createDocument data, callback
-
       expect(couchdb.request).toHaveBeenCalledWith options, callback
-      couchdb.getUuid = couchdbGetUuid
 
   describe "getUuid", ->
     it "should call proper request", ->
@@ -52,13 +49,18 @@ describe "couchdb", ->
 
   describe "request", ->
     req = undefined
+    res = undefined
     beforeEach ->
       req = Object.create(
         end: ->
 
         write: ->
       )
-      spyOn(http, "request").andReturn req
+      res = new EventEmitter()
+      s = spyOn(http, "request").andReturn req
+      s.andCallFake (params, callback) ->
+        callback res
+        req
     it "should call http.request with valid params", ->
       couchdb.request()
       expect(http.request).toHaveBeenCalledWith couchdb.options, jasmine.any(Function)
@@ -93,16 +95,6 @@ describe "couchdb", ->
       couchdb.request data: "foo"
       expect(req.write).toHaveBeenCalledWith "foo"
     describe "response", ->
-      res = undefined
-      httpRequest = undefined
-      beforeEach ->
-        res = new EventEmitter()
-        httpRequest = http.request
-        http.request = (params, callback) ->
-          callback res
-          req
-      afterEach ->
-        http.request = httpRequest
       it "should register handler for data event", ->
         spyOn res, "on"
         couchdb.request()
