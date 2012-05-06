@@ -16,11 +16,15 @@ describe "couchdb", ->
   describe "storeEvent", ->
     it "should call create Document", ->
       spyOn couchdb, 'createDocument'
+      spyOn(Date::, "getTime").andCallFake ->
+        123456
       couchdb.storeEvent 1, 'user:created',
         foo: "bar"
       expect(couchdb.createDocument).toHaveBeenCalledWith JSON.stringify(
         aggregateId: 1
         name: "user:created"
+        type: "event"
+        time: 123456
         attrs:
           foo: "bar"
       )
@@ -123,6 +127,9 @@ describe "couchdb", ->
           couchdb.request {}, foo.callback
           res.emit "end", "foo"
           expect(foo.callback).toHaveBeenCalledWith "foo"
+      it "doesnt require callbaxk to be specified", ->
+        couchdb.request {}
+        res.emit "end", "foo"
       it "should call store data into buffer", ->
         foo = callback: ->
 
