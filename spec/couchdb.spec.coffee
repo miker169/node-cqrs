@@ -6,6 +6,16 @@ describe "couchdb", ->
   couchdb = undefined
   beforeEach ->
     couchdb = new CouchDb('cqrs')
+  describe "instance", ->
+    it "should get instance of couchdb", ->
+      couchdb = CouchDb.getInstance()
+      expect(typeof couchdb.request).toEqual "function"
+    it "should return just one instance", ->
+      couch1 = CouchDb.getInstance()
+      couch2 = CouchDb.getInstance()
+      couch1.database = "TestDb"
+      expect(couch2.database).toEqual "TestDb"
+
   describe "constructor", ->
     it "should store database name", ->
       expect(couchdb.database).toEqual 'cqrs'
