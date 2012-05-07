@@ -1,0 +1,40 @@
+info it worked if it ends with ok
+verbose cli [ 'node', '/usr/local/bin/npm', 'test' ]
+info using npm@1.1.12
+info using node@v0.6.14
+verbose config file /Users/michaelrayner/.npmrc
+verbose config file /usr/local/etc/npmrc
+verbose config file /usr/local/lib/node_modules/npm/npmrc
+verbose caching /Users/michaelrayner/code/node/node-cqrs/package.json
+verbose loadDefaults node-cqrs@0.1.0
+verbose run-script [ 'pretest', 'test', 'posttest' ]
+info pretest node-cqrs@0.1.0
+info test node-cqrs@0.1.0
+verbose unsafe-perm in lifecycle true
+silly exec sh "-c" "./bin/test"
+silly spawning [ 'sh',
+silly spawning   [ '-c', './bin/test' ],
+silly spawning   '/Users/michaelrayner/code/node/node-cqrs' ]
+info node-cqrs@0.1.0 Failed to exec test script
+ERR! node-cqrs@0.1.0 test: `./bin/test`
+ERR! `sh "-c" "./bin/test"` failed with 1
+ERR! 
+ERR! Failed at the node-cqrs@0.1.0 test script.
+ERR! This is most likely a problem with the node-cqrs package,
+ERR! not with npm itself.
+ERR! Tell the author that this fails on your system:
+ERR!     ./bin/test
+ERR! You can get their info via:
+ERR!     npm owner ls node-cqrs
+ERR! There is likely additional logging output above.
+ERR! 
+ERR! System Darwin 11.3.0
+ERR! command "node" "/usr/local/bin/npm" "test"
+ERR! cwd /Users/michaelrayner/code/node/node-cqrs
+ERR! node -v v0.6.14
+ERR! npm -v 1.1.12
+ERR! code ELIFECYCLE
+ERR! message node-cqrs@0.1.0 test: `./bin/test`
+ERR! message `sh "-c" "./bin/test"` failed with 1
+ERR! errno {}
+verbose exit [ 1, true ]

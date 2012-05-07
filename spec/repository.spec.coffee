@@ -9,3 +9,5 @@ describe "Repository", ->
     expect(typeof Repository).toEqual 'function'
   it "should store thr strategy object", ->
     expect(repository.strategy).toEqual 'foo'
+  it "should be a singleton", ->
+    expect(typeof Repository.getInstance).toBe 'function'
