@@ -6,7 +6,7 @@ describe "Repository", ->
   beforeEach ->
     strategy = 
       storeEvent: ->
-
+      getEventsByAggregate: ->
     repository = new Repository strategy 
   it "should exist", ->
     expect(Repository).toBeDefined()
@@ -19,3 +19,10 @@ describe "Repository", ->
     spyOn repository.strategy, 'storeEvent'
     repository.storeEvent()
     expect(repository.strategy.storeEvent).toHaveBeenCalled()
+
+  it "should delegate getEventsByAggregate method to strategy", ->
+    spyOn repository.strategy, 'getEventsByAggregate'
+    repository.getEventsByAggregate()
+    expect(repository.strategy.getEventsByAggregate).toHaveBeenCalled()
+
+
