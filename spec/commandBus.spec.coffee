@@ -13,6 +13,12 @@ describe "CommandBus", ->
 
       commandBus.registerHandler "event", f
       expect(commandBus.handlers["event"]).toEqual f
+    it "should accept only function as a handler", ->
+      expect(->
+        commandBus.registerHandler 'event', 'handler'
+      ).toThrow 'Handler has to be a function!'
+
+      
   describe "execute", ->
     it "should thrown an error in the case where handler doesnt exist", ->
       expect(->
