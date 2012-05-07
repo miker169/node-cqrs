@@ -24,5 +24,31 @@ describe "Repository", ->
     spyOn repository.strategy, 'getEventsByAggregate'
     repository.getEventsByAggregate()
     expect(repository.strategy.getEventsByAggregate).toHaveBeenCalled()
+  describe "Handlers", ->
+    it "should have an empty handler to start", ->
+      expect(repository.handlers).toEqual {}
+    it "should add event to handlers", ->
+      f = ->
+      repository.on('foo', f);
+      expect(repository.handlers['foo']).toEqual [f]
+    it "should allow multiple handlers for the same event", ->
+      f = ->
+      f2 = ->
+      repository.on('foo', f);
+      repository.on('foo', f2);
+      expect(repository.handlers['foo']).toEqual [f, f2]
+    it "should not allow you to add the same handler twice for the same event", ->
+      f = ->
+
+      repository.on 'foo', f
+      repository.on 'foo', f
+      expect(repository.handlers['foo']).toEqual [f]
+    it "should not allow you to add the same handler for different events", ->
+      f = ->
+
+      repository.on 'foo', f
+      repository.on 'foobar', f
+      expect(repository.handlers['foo']).toEqual [f]
+      expect(repository.handlers['foobar']).toEqual [f]
 
 
