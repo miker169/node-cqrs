@@ -59,21 +59,39 @@ describe "couchdb", ->
       expect(couchdb.parseEvents).toHaveBeenCalledWith "data", f
 
   describe "getEventsByType", ->
+    beforeEach ->
+      spyOn(couchdb, 'request').andCallFake (data, callback) ->
+       callback "{\"rows\": [{\"_id\":1, \"_ref\":1, \"value\": {\"foo\": \"bar\"}}]}"
     it "should call request", ->
-      spyOn couchdb, 'request'
       couchdb.getEventsByName 'foo', ->
 
       expect(couchdb.request).toHaveBeenCalledWith
         method: 'GET'
         path: '/cqrs/_design/cqrs/_view/name?startkey=["foo",0]&endkey=["foo",9999999999999]'
       , jasmine.any(Function)
+    describe "with event list", ->
+      it "should call request for each event", ->
+        couchdb.getEventsByName [ "foo", "bar"], ->
+        expect(couchdb.request).toHaveBeenCalledWith
+          method: "GET"
+          path: "/cqrs/_design/cqrs/_view/name?startkey=[\"foo\",0]&endkey=[\"foo\",9999999999999]"
+        , jasmine.any Function
+        expect(couchdb.request).toHaveBeenCalledWith
+          method: "GET"
+          path: "/cqrs/_design/cqrs/_view/name?startkey=[\"bar\",0]&endkey=[\"bar\",9999999999999]"
+        , jasmine.any Function
+      it "should call callback just once", ->
+        foo = f: ->
+
+        spyOn foo, 'f'
+        couchdb.getEventsByName ['foo', 'bar'], foo.f
+        expect(foo.f.callCount).toEqual 1
+
     it "should call parseEvents", ->
       f = ->
       spyOn couchdb, 'parseEvents'
-      spyOn(couchdb, 'request').andCallFake (data, callback) ->
-        callback 'data'
       couchdb.getEventsByName 'foo', f
-      expect(couchdb.parseEvents).toHaveBeenCalledWith 'data', f
+      expect(couchdb.parseEvents).toHaveBeenCalledWith "{\"rows\": [{\"_id\":1, \"_ref\":1, \"value\": {\"foo\": \"bar\"}}]}", f
 
 
 
