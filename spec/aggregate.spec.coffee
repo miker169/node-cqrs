@@ -1,79 +1,59 @@
+util = require "util"
+db = require("../lib/couchdb").getInstance()
 Aggregate = require "../lib/aggregate"
-EventBus = require "../lib/eventBus"
 jasmine = require "jasmine-node"
 
-describe 'Aggregate', ->
+describe "Aggregate", ->
+  Foo = undefined
+  foo = undefined
+  dbGetEventsByAggregateSpy = undefined
   beforeEach ->
-    EventBus.storeSnapshot = ->
+    Foo = (id, callback) ->
+      Aggregate.call this, id, callback
 
-  describe "emit", ->
-    it "should emit event to the event bus", ->
-      aggregate = new Aggregate 1
-      spyOn EventBus, 'storeEvent'
-      aggregate.emit 'foo', {foo: 'bar'}
-      expect(EventBus.storeEvent).toHaveBeenCalledWith( 'foo', 1, {foo: 'bar'})
-
+    util.inherits Foo, Aggregate
+    dbGetEventsByAggregateSpy =  spyOn(db, "getEventsByAggregate").andCallFake (id, callback) ->
+      callback []
+    foo = new Foo 1
   describe "constructor", ->
     it "should load data from the event bus", ->
-      spyOn EventBus, "loadData"
-      aggregate = new Aggregate(1)
-      expect(EventBus.loadData).toHaveBeenCalledWith 1, jasmine.any(Function)
-    describe "load data callback", ->
-      aggregate = null
-      foo = foo: "bar"
-      it "should not call init if no snapshot is ready", ->
-        runs ->
-          EventBus.loadData = (id, callback) ->
-            setTimeout (->
-              callback null, [], null
-            ), 10
-          @aggregate = new Aggregate(1)
-          spyOn @aggregate, "init"
-        waits 15
-        runs ->
-          expect(@aggregate.init).not.toHaveBeenCalled()
+      foo = new Foo 1
+      expect(db.getEventsByAggregate).toHaveBeenCalledWith(1, jasmine.any(Function))
+    it "should call apply for all events", ->
+      event = undefined
+      runs ->
+        event = name: "myEvent"
+        dbGetEventsByAggregateSpy.andCallFake (id, callback) ->
+          setTimeout (->
+            callback [event]
+          ), 10
+        foo = new Foo 1
+        spyOn foo, "apply"
+      waits 15
+      runs ->
+        expect(foo.apply).toHaveBeenCalledWith event
+    it "should call callback if require", ->
+      @handler = ->
 
-      it "should call init, if snapshot is ready",  ->
-        runs ->
-          EventBus.loadData = (id, callback) ->
-            setTimeout (->
-              callback foo, [], null
-            ), 10
-          @aggregate = new Aggregate 1
-          spyOn @aggregate, "init"
-        waits 15
-        runs ->
-          expect(@aggregate.init).toHaveBeenCalledWith foo
-      it "should call apply, for all events", ->
-        runs ->
-          EventBus.loadData = (id, callback) ->
-            setTimeout (->
-              callback null, [foo], null
-            ), 10
-          @aggregate = new Aggregate 1
-          spyOn @aggregate, "apply"
-        waits 15
-        runs ->
-          expect(@aggregate.apply).toHaveBeenCalledWith foo
-      it "should call store snapshot", ->
-        runs ->
-          EventBus.loadData = (id, callback) ->
-            setTimeout (->
-              callback null, [foo], 1
-            ), 10
-          @aggregate = new Aggregate 1
-          spyOn EventBus, "storeSnapshot"
-          spyOn(@aggregate, "snapshot").andReturn foo
-        waits 15
-        runs ->
-          expect(EventBus.storeSnapshot).toHaveBeenCalledWith 1, 1, foo
-      it "should call callback if one is specified", ->
-        @handler = ->
-        EventBus.loadData = (id, callback) ->
-          callback null, [foo], 1
-        spyOn this, "handler"
-        @aggregate = new Aggregate 1, @handler
-        expect(@handler).toHaveBeenCalled()
+      spyOn this, 'handler'
+      foo = new Foo 1, @handler
+      expect(@handler).toHaveBeenCalled()
+  describe "apply", ->
+    it "should raise error if handler is missing", ->
+      event = name: "myEvent"
+      expect(->
+        foo.apply event
+      ).toThrow "There is no handler for 'MyEvent' event!"
+    it "should call appropriate handler", ->
+      event = name: "myEvent"
+      Foo::onMyEvent = ->
 
-
+      spyOn foo, "onMyEvent"
+      foo.apply event
+      expect(foo.onMyEvent).toHaveBeenCalledWith event
+  describe "emit", ->
+    it "should store event", ->
+      spyOn db , "storeEvent"
+      foo.emit 'foo', foo: 'bar'
+      expect(db.storeEvent).toHaveBeenCalledWith 1, 'foo', foo: 'bar'
 
