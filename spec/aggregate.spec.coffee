@@ -1,5 +1,5 @@
 util = require "util"
-db = require("../lib/couchdb").getInstance()
+db = require("../lib/repository/couchdb").getInstance()
 Aggregate = require "../lib/aggregate"
 jasmine = require "jasmine-node"
 
