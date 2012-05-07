@@ -1,5 +1,6 @@
 util = require "util"
-db = require("../lib/repository/couchdb").getInstance()
+couchdb = require("../lib/repository/couchdb").getInstance()
+repository = require("../lib/repository").getInstance()
 Aggregate = require "../lib/aggregate"
 jasmine = require "jasmine-node"
 
@@ -8,17 +9,18 @@ describe "Aggregate", ->
   foo = undefined
   dbGetEventsByAggregateSpy = undefined
   beforeEach ->
+    repository.strategy = couchdb
     Foo = (id, callback) ->
       Aggregate.call this, id, callback
 
     util.inherits Foo, Aggregate
-    dbGetEventsByAggregateSpy =  spyOn(db, "getEventsByAggregate").andCallFake (id, callback) ->
+    dbGetEventsByAggregateSpy =  spyOn(repository, "getEventsByAggregate").andCallFake (id, callback) ->
       callback []
     foo = new Foo 1
   describe "constructor", ->
     it "should load data from the event bus", ->
       foo = new Foo 1
-      expect(db.getEventsByAggregate).toHaveBeenCalledWith(1, jasmine.any(Function))
+      expect(repository.getEventsByAggregate).toHaveBeenCalledWith(1, jasmine.any(Function))
     it "should call apply for all events", ->
       event = undefined
       runs ->
@@ -53,7 +55,7 @@ describe "Aggregate", ->
       expect(foo.onMyEvent).toHaveBeenCalledWith event
   describe "emit", ->
     it "should store event", ->
-      spyOn db , "storeEvent"
+      spyOn repository , "storeEvent"
       foo.emit 'foo', foo: 'bar'
-      expect(db.storeEvent).toHaveBeenCalledWith 1, 'foo', foo: 'bar'
+      expect(repository.storeEvent).toHaveBeenCalledWith 1, 'foo', foo: 'bar'
 
