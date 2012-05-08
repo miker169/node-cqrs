@@ -23,7 +23,6 @@ describe "couchdb", ->
       expect(couchdb.options.host).toEqual "localhost"
     it "port should default to 5984", ->
       expect(couchdb.options.port).toEqual 5984
-
   describe "createDocument", ->
     it "should call proper request", ->
       callback = ->
