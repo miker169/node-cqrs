@@ -24,4 +24,18 @@ describe "CouchStorage", ->
       spyOn couchStorage, "request"
       couchStorage.loadView 'f456575jhg'
       expect(couchStorage.request).toHaveBeenCalledWith {method: 'GET', path: '/cqrs/f456575jhg'}, jasmine.any Function
+    it "should parse the returned data", ->
+      data =  '{"id":"123","rev":"123","uid":"123","type":"view","lastEvent":"123","data":{"foo":"bar"}}'
+      foo = f: ->
+
+      spyOn foo, 'f'
+      spyOn(couchStorage, 'request').andCallFake (id, callback) ->
+        callback data
+
+      couchStorage.loadView '123', foo.f
+
+      expect(foo.f).toHaveBeenCalledWith
+        uid: '123'
+        lastEvent: '123'
+        data: foo: 'bar'
 
