@@ -1,5 +1,6 @@
 /*global require:true, module:true
  */
+/*Public API for CQRS system*/
 var Aggregate = require('./lib/aggregate'),
     CommandBus = require('./lib/commandBus'),
     View = require('./lib/view'),
