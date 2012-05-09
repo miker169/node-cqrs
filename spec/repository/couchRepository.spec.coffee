@@ -89,6 +89,7 @@ describe "CouchRepository", ->
 
     it "should call parseEvents", ->
       f = ->
+
       spyOn couchdb, 'parseEvents'
       couchdb.getEventsByName 'foo',0, f
       expect(couchdb.parseEvents).toHaveBeenCalledWith "{\"rows\": [{\"_id\":1, \"_ref\":1, \"value\": {\"foo\": \"bar\"}}]}", f
