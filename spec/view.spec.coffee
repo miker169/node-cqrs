@@ -1,8 +1,10 @@
 util = require "util"
 couchdb = require("../lib/repository/couch").getInstance()
 repository = require("../lib/repository").getInstance()
+storage = require("../lib/storage/couch").getInstance()
 jasmine = require("jasmine-node")
 View = require("../lib/view")
+
 describe "View", ->
   view = undefined
   MyView = undefined
@@ -17,10 +19,12 @@ describe "View", ->
     view = new MyView()
 
   describe "load", ->
-    it "should load data from the repository", ->
+    it "should load data from storage", ->
+      spyOn storage, 'loadView'
+      view.uid = '45hj12'
       view.load()
-      expect(repository.getEventsByName).toHaveBeenCalledWith "foo", jasmine.any Function
-    it "should call apply, for all events", ->
+      expect(storage.loadView).toHaveBeenCalledWith "45hj12", jasmine.any Function
+    ###it "should call apply, for all events", ->
       event = foo: 'bar'
       spyOn view, "apply"
       repository.getEventsByName.andCallFake (names, callback) ->
@@ -32,6 +36,7 @@ describe "View", ->
       spyOn this, "handler"
       view.load @handler
       expect(@handler).toHaveBeenCalled()
+      ###
     describe "apply", ->
       it "should call raise error if handler is missing", ->
         event = name: "myEvent"
