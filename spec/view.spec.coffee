@@ -32,21 +32,22 @@ describe "View", ->
             lastEvent: 12345
             data:
               foo: 'bar'
+          
       it "should loads the events increment data from the repository", ->
         view.load()
-        expect(repository.getEventsName).toHaveBeenCalledWith 'foo', 12345, jasmine.any Function
-    it "should call apply, for all events", ->
-      event = foo: 'bar'
-      spyOn view, "apply"
-      repository.getEventsByName.andCallFake (names,from, callback) ->
-        callback [event]
-      view.load()
-      expect(view.apply).toHaveBeenCalledWith event
-    it "should call callback if specified", ->
-      @handler = ->
-      spyOn this, "handler"
-      view.load @handler
-      expect(@handler).toHaveBeenCalled()
+        expect(repository.getEventsByName).toHaveBeenCalledWith 'foo', 12345, jasmine.any Function
+      it "should call apply, for all events", ->
+        event = foo: 'bar'
+        spyOn view, "apply"
+        repository.getEventsByName.andCallFake (names,from, callback) ->
+          callback [event]
+        view.load()
+        expect(view.apply).toHaveBeenCalledWith event
+      it "should call callback if specified", ->
+        @handler = ->
+        spyOn this, "handler"
+        view.load @handler
+        expect(@handler).toHaveBeenCalled()
     
     describe "apply", ->
       it "should call raise error if handler is missing", ->
