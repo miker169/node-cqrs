@@ -4,6 +4,12 @@ describe "CommandBus", ->
   commandBus = undefined
   beforeEach ->
     commandBus = new CommandBus()
+  describe "instance", ->
+    it "should get instance of couchStorage", ->
+      commandBus = CommandBus.getInstance()
+      expect(typeof commandBus.execute).toEqual 'function'
+    it "should return just one instance", ->
+      expect(CommandBus.getInstance()).toEqual CommandBus.getInstance()
 
   it "should initialize empty handlers list", ->
     expect(commandBus.handlers).toEqual {}
