@@ -41,8 +41,8 @@ describe "View", ->
           
       it "should loads the events increment data from the repository", ->
         view.load()
-        expect(repository.getEventsByName).toHaveBeenCalledWith 'foo', 12345, jasmine.any Function
-      it "should call apply, for all events", ->
+        expect(repository.getEventsByName).toHaveBeenCalledWith 'foo', 12346, jasmine.any Function
+      xit "should call apply, for all events", ->
         event = foo: 'bar'
         spyOn view, "apply"
         repository.getEventsByName.andCallFake (names,from, callback) ->
