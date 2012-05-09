@@ -32,6 +32,9 @@ describe "View", ->
             lastEvent: 12345
             data:
               foo: 'bar'
+      it "should store data to the view", ->
+        view.load()
+        expect(view.data).toEqual foo: 'bar'
           
       it "should loads the events increment data from the repository", ->
         view.load()
