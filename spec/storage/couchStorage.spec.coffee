@@ -1,4 +1,4 @@
-CouchStorage = require "../../lib/storage/couch"
+CouchStorage = require "../../lib/storage/couchStorage"
 jasmine = require 'jasmine-node'
 
 describe "CouchStorage", ->
