@@ -20,6 +20,8 @@ describe "Aggregate", ->
   describe "constructor", ->
     it "should load data from the event bus", ->
       foo = new Foo 1
+    it "should be extendable", ->
+      expect(typeof Aggregate.extend).toEqual 'function'
       expect(repository.getEventsByAggregate).toHaveBeenCalledWith(1, jasmine.any(Function))
     it "should call apply for all events", ->
       event = undefined
