@@ -18,3 +18,13 @@ describe "Utils", ->
       instance = Base.getInstance()
       expect(Base.getInstance()).toBe instance
       expect(typeof Base.getInstance().foo).toEqual "function"
+
+
+  describe "extendable", ->
+    beforeEach ->
+      Base = ->
+      Base::foo = ->
+
+    it "should define extend method", ->
+      utils.extendable Base
+      expect(typeof Base.extend).toEqual 'function'
