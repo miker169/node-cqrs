@@ -1,21 +1,11 @@
 http = require "http"
 jasmine = require "jasmine-node"
-CouchDb = require "../../lib/repository/couchdb"
+CouchDb = require "../../lib/util/couchdb"
 EventEmitter = require("events").EventEmitter
 describe "couchdb", ->
   couchdb = undefined
   beforeEach ->
     couchdb = new CouchDb('cqrs')
-  describe "instance", ->
-    it "should get instance of couchdb", ->
-      couchdb = CouchDb.getInstance()
-      expect(typeof couchdb.request).toEqual "function"
-    it "should return just one instance", ->
-      couch1 = CouchDb.getInstance()
-      couch2 = CouchDb.getInstance()
-      couch1.database = "TestDb"
-      expect(couch2.database).toEqual "TestDb"
-
   describe "constructor", ->
     it "should store database name", ->
       expect(couchdb.database).toEqual 'cqrs'
@@ -23,60 +13,6 @@ describe "couchdb", ->
       expect(couchdb.options.host).toEqual "localhost"
     it "port should default to 5984", ->
       expect(couchdb.options.port).toEqual 5984
-  describe "storeEvent", ->
-    it "should call create Document", ->
-      spyOn couchdb, 'createDocument'
-      spyOn(Date::, "getTime").andCallFake ->
-        123456
-      couchdb.storeEvent 1, 'user:created',
-        foo: "bar"
-      expect(couchdb.createDocument).toHaveBeenCalledWith JSON.stringify(
-        aggregateId: 1
-        name: "user:created"
-        type: "event"
-        time: 123456
-        attrs:
-          foo: "bar"
-      )
-  describe "getEventsByAggregate", ->
-    it "should call request", ->
-      spyOn couchdb, 'request'
-      couchdb.getEventsByAggregate 1, ->
-
-      expect(couchdb.request).toHaveBeenCalledWith
-        method: "GET"
-        path: "/cqrs/_design/cqrs/_view/aggregate?startKey=[1,0]&endkey=[1,9999999999999]"
-      , jasmine.any Function
-
-    it "should call parseEvents", ->
-      f = ->
-
-      spyOn couchdb, "parseEvents"
-      spyOn(couchdb, "request").andCallFake (data, callback) ->
-        callback "data"
-
-      couchdb.getEventsByAggregate 1, f
-      expect(couchdb.parseEvents).toHaveBeenCalledWith "data", f
-
-  describe "getEventsByType", ->
-    it "should call request", ->
-      spyOn couchdb, 'request'
-      couchdb.getEventsByName 'foo', ->
-
-      expect(couchdb.request).toHaveBeenCalledWith
-        method: 'GET'
-        path: '/cqrs/_design/cqrs/_view/name?startkey=["foo",0]&endkey=["foo",9999999999999]'
-      , jasmine.any(Function)
-    it "should call parseEvents", ->
-      f = ->
-      spyOn couchdb, 'parseEvents'
-      spyOn(couchdb, 'request').andCallFake (data, callback) ->
-        callback 'data'
-      couchdb.getEventsByName 'foo', f
-      expect(couchdb.parseEvents).toHaveBeenCalledWith 'data', f
-
-
-
   describe "createDocument", ->
     it "should call proper request", ->
       callback = ->

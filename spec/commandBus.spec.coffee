@@ -4,6 +4,12 @@ describe "CommandBus", ->
   commandBus = undefined
   beforeEach ->
     commandBus = new CommandBus()
+  describe "instance", ->
+    it "should get instance of couchStorage", ->
+      commandBus = CommandBus.getInstance()
+      expect(typeof commandBus.execute).toEqual 'function'
+    it "should return just one instance", ->
+      expect(CommandBus.getInstance()).toEqual CommandBus.getInstance()
 
   it "should initialize empty handlers list", ->
     expect(commandBus.handlers).toEqual {}
@@ -30,4 +36,13 @@ describe "CommandBus", ->
       spyOn commandBus.handlers, "foo"
       commandBus.execute "foo", foo: "bar"
       expect(commandBus.handlers["foo"]).toHaveBeenCalledWith foo: "bar"
+    it "should pass callback if supplied", ->
+      cb = undefined
+      f = ->
+
+      commandBus.handlers['foo'] = (attrs, callback) ->
+        cb = callback
+
+      commandBus.execute 'foo', foo: 'bar', f
+      expect(cb).toEqual f
 
